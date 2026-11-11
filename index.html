@@ -1,0 +1,1110 @@
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>reinterpretationJUGGLING</title>
+
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 10%,
+        rgba(208, 234, 246, 0.55), transparent 48%),
+      radial-gradient(ellipse at 90% 75%,
+        rgba(222, 237, 246, 0.35), transparent 42%),
+      #f8fbfc;
+    color: #536d7b;
+    font-family:
+      "Helvetica Neue", "Hiragino Kaku Gothic ProN",
+      "Yu Gothic", sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    position: relative;
+    padding: 58px 20px 36px;
+    text-align: center;
+  }
+
+  header::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: calc(50% - 90px);
+    top: 5px;
+    border-radius: 50%;
+    background: rgba(210, 237, 249, 0.4);
+    filter: blur(55px);
+    pointer-events: none;
+  }
+
+  
+h1 {
+  position: relative;
+  margin: 0;
+  font-family:
+    "Hiragino Mincho ProN",
+    "Yu Mincho",
+    "Noto Serif JP",
+    serif;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+  color: #7997A8;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95),
+    0 4px 18px rgba(159, 199, 218, 0.18);
+}
+
+
+  header p {
+    position: relative;
+    margin: 15px 0 0;
+    color: #a3b9c3;
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 0.24em;
+  }
+
+  main {
+    width: min(100% - 28px, 740px);
+    margin: 0 auto;
+    padding: 0 0 60px;
+  }
+
+  .screen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #edf4f7;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 3px;
+    box-shadow:
+      0 0 0 1px rgba(185, 215, 228, 0.2),
+      0 18px 60px rgba(139, 177, 196, 0.12);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .status {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 2px;
+    background: rgba(248, 252, 253, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #7e9ba9;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  
+.panel {
+  margin-top: 18px;
+  padding: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.78),
+      rgba(230, 243, 250, 0.38)
+    );
+  box-shadow:
+    0 12px 36px rgba(140, 179, 198, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(18px) saturate(115%);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+}
+
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  button,
+  select {
+    min-height: 44px;
+    padding: 12px;
+    border: 1px solid #dce9ef;
+    border-radius: 3px;
+    background: rgba(250, 253, 254, 0.88);
+    color: #688797;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:hover,
+  select:hover {
+    border-color: #bcd8e5;
+    background: #edf7fb;
+  }
+
+  button:active {
+    transform: scale(0.985);
+  }
+
+  button.primary {
+    border-color: #d0e6f0;
+    background: #e5f2f8;
+    color: #557e92;
+  }
+
+  button:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  .setting {
+    margin-top: 24px;
+  }
+
+  .setting:first-child {
+    margin-top: 0;
+  }
+
+  .setting-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 11px;
+    color: #718c99;
+    font-size: 12px;
+  }
+
+  output {
+    color: #8db2c3;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: #9bc5d6;
+    cursor: pointer;
+  }
+
+  .toggles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 3px;
+    background: rgba(242, 249, 252, 0.7);
+    color: #718b98;
+    font-size: 11px;
+  }
+
+  .toggle input {
+    width: 16px;
+    height: 16px;
+    accent-color: #92bbcd;
+  }
+
+  .hint {
+    color: #96aab4;
+    font-size: 11px;
+    line-height: 2;
+  }
+
+  #message {
+    color: #789baa;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+
+  @media (max-width: 390px) {
+    header {
+      padding-top: 42px;
+    }
+
+    h1 {
+      font-size: 27px;
+    }
+
+    .panel {
+      padding: 15px;
+    }
+
+    .buttons {
+      gap: 8px;
+    }
+
+    button {
+      font-size: 11px;
+    }
+  }
+
+
+/* 全画面表示ボタン */
+.screen {
+  position: relative;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 6px;
+  background: rgba(245, 250, 253, 0.82);
+  color: #688797;
+  font-size: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* 全画面では映像を画面いっぱいに */
+.screen:fullscreen {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+  border: none;
+  border-radius: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 全画面時はキャンバスを拡大 */
+.screen:fullscreen #view {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 投影映像に操作用の表示を出さない */
+.screen:fullscreen .status,
+.screen:fullscreen .fullscreen-btn {
+  display: none;
+}
+
+/* 全画面の背景 */
+.screen:fullscreen::backdrop {
+  background: #000;
+}
+
+</style>
+
+
+</head>
+<body>
+<header>
+  <h1>reinterpretationJUGGLING</h1>
+</header>
+
+<main>
+  
+<div class="screen">
+  <canvas id="view" width="960" height="720"></canvas>
+  <div class="status" id="status">カメラ停止中</div>
+  <button class="fullscreen-btn" id="fullscreenBtn" type="button">
+    ⛶ 全画面表示
+  </button>
+</div>
+
+
+  <section class="panel">
+    <div class="buttons">
+      <button class="primary" id="start">カメラを起動</button>
+      <button id="stop">カメラを停止</button>
+      <button id="switch">内カメラ／外カメラ</button>
+      <button id="reset">軌跡をクリア</button>
+      <button id="record">● 録画スタート</button>
+      <button id="clearRecord" disabled>録画停止・保存</button>
+    </div>
+    <p id="message">カメラを起動して、明るいボールを動かしてみよう。</p>
+  </section>
+
+  <section class="panel">
+    <div class="setting">
+      <div class="setting-head">
+        <label for="copies">複製するボールの個数</label>
+        <output id="copiesOut">3 個</output>
+      </div>
+      <input id="copies" type="range" min="0" max="3" value="3">
+    </div>
+
+    <div class="setting">
+      <div class="setting-head">
+        <label for="delay">複製の時間差</label>
+        <output id="delayOut">100 ms</output>
+      </div>
+      <input id="delay" type="range" min="30" max="400" step="10" value="100">
+    </div>
+
+    <div class="setting">
+      <div class="setting-head">
+        <label for="threshold">光を検出する感度</label>
+        <output id="thresholdOut">190</output>
+      </div>
+      <input id="threshold" type="range" min="100" max="250" value="190">
+    </div>
+
+    <div class="setting">
+      <div class="setting-head">
+        <label for="strength">光の強さ</label>
+        <output id="strengthOut">1.0</output>
+      </div>
+      <input id="strength" type="range" min="0.3" max="2.5" step="0.1" value="1">
+    </div>
+    
+    <div class="setting">
+      <div class="setting-head">
+        <label for="ballSize">複製ボールの大きさ</label>
+        <output id="ballSizeOut">100%</output>
+      </div>
+      <input id="ballSize" type="range" min="50" max="1000" step="10" value="100">
+    </div>
+
+    <div class="setting">
+      <div class="setting-head">
+        <label for="trailSeconds">軌跡の長さ</label>
+        <output id="trailSecondsOut">5.0秒</output>
+      </div>
+      <input id="trailSeconds" type="range" min="0.2" max="5" step="0.2" value="5">
+    </div>
+ 
+  </section>
+
+  <section class="panel">
+    <div class="toggles">
+    <div class="setting">
+    <div class="setting-head">
+      <label for="detectCount">検出する光ボールの数</label>
+    </div>
+    <select id="detectCount">
+      <option value="1" selected>1個</option>
+      <option value="2">2個</option>
+    </select>
+  </div>            
+      <label class="toggle">
+        <input id="dupOn" type="checkbox" checked>
+        複製 ON
+      </label>
+      <label class="toggle">
+        <input id="trailOn" type="checkbox" checked>
+        軌跡 ON
+      </label>
+      <label class="toggle">
+        <input id="cameraBg" type="checkbox" checked>
+        背景：カメラ映像
+      </label>
+    </div>
+  </section>
+
+  <section class="panel hint">
+    <strong>あそび方</strong><br>
+    1. カメラを起動する。<br>
+    2. 明るいボールやライトをカメラに映す。<br>
+    3. 複製の確認。<br>
+    4. スライダーで表現を変えてみる。<br>
+    ※光の検出は、明るい部分を探す簡易方式です。複数の明るい物があると検出位置がずれることがあります。
+  </section>
+</main>
+
+<video id="video" autoplay playsinline muted
+       style="display:none"></video>
+<canvas id="analysis" width="120" height="90"
+        style="display:none"></canvas>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $("view");
+  const ctx = canvas.getContext("2d");
+  const video = $("video");
+  const analysis = $("analysis");
+  const actx = analysis.getContext("2d", { willReadFrequently: true });
+
+  let stream = null;
+  let facing = "environment";
+  let tracks = [
+    { points: [], lastPoint: null },
+    { points: [], lastPoint: null }
+  ];
+  let recorder = null;
+  let chunks = [];
+  let recording = false;
+  let animationId = 0;
+  let lastDetection = 0;
+  let ballSize = 1;
+$("ballSize").addEventListener("input", event => {
+  ballSize = Number(event.target.value) / 100;
+});
+
+
+const trailSeconds = $("trailSeconds");
+const trailSecondsOut = $("trailSecondsOut");
+
+trailSeconds.addEventListener("input", event => {
+  const seconds = Number(event.target.value);
+
+  trailSecondsOut.textContent =
+    seconds.toFixed(1) + "秒";
+
+  historyMs = seconds * 1000;
+});
+
+
+  let historyMs = 5000;
+
+  function message(text) {
+    $("message").textContent = text;
+  }
+
+  function setStatus(text) {
+    $("status").textContent = text;
+  }
+
+  function clearHistory() {
+  tracks.forEach(track => {
+    track.points = [];
+    track.lastPoint = null;
+  });
+  resetQualification();
+}
+
+  function slider(id, outputId, format) {
+    const el = $(id);
+    const out = $(outputId);
+    const update = () => out.textContent = format(el.value);
+    el.addEventListener("input", update);
+    update();
+  }
+
+  slider("copies", "copiesOut", v => `${v} 個`);
+  slider("delay", "delayOut", v => `${v} ms`);
+  slider("threshold", "thresholdOut", v => v);
+  slider("strength", "strengthOut", v => Number(v).toFixed(1));
+  slider("ballSize", "ballSizeOut", v => `${v}%`);
+
+  // ── 複製ボールの解放システム ──
+  // 初期上限3個。2/3個のいずれかで成功 → 5個、
+  // 4/5個で成功 → 7個、6/7個で成功 → 9個。
+  const FINAL_COPIES = 9;
+  const COLLISION_GRACE_MS = 100; // 瞬間的な接触だけ許容（約0.1秒）
+  let unlockedCopies = 3;
+  let qualifyingMs = 0;
+  let collisionBeganAt = null;
+  let qualificationLastFrame = null;
+  let qualificationWasClear = false;
+
+  $("copies").max = unlockedCopies;
+
+  function resetQualification() {
+    qualifyingMs = 0;
+    collisionBeganAt = null;
+    qualificationLastFrame = null;
+    qualificationWasClear = false;
+  }
+
+  // 現在の表示サイズに合わせ、全ボールの中心間距離で接触を判定する。
+  // 光のぼかし部分（shadowBlur）ではなく、実際に描画した円の半径を使う。
+  function evaluateUnlock(now) {
+    const copies = Number($("copies").value);
+    const shouldChallenge =
+      stream && $("dupOn").checked && unlockedCopies < FINAL_COPIES &&
+      (copies === unlockedCopies || copies === unlockedCopies - 1);
+
+    if (!shouldChallenge) {
+      resetQualification();
+      return;
+    }
+
+    const delayMs = Number($("delay").value);
+    const strength = Number($("strength").value);
+    const radius = (11 + strength * 4) * ballSize;
+    const centers = [];
+    const trackCount = Number($("detectCount").value);
+
+    // 必要な複製がすべて生成され、追跡が継続している間だけ計測する。
+    for (let i = 0; i < trackCount; i++) {
+      const track = tracks[i];
+      const oldestNeeded = now - copies * delayMs;
+
+      if (!track.lastPoint || now - track.lastPoint.time > 120 ||
+          track.points.length < 2 || track.points[0].time > oldestNeeded) {
+        resetQualification();
+        return;
+      }
+
+      // 元の光 + 時間差で表示される複製のすべてを判定対象にする。
+      centers.push(track.lastPoint);
+      for (let j = 1; j <= copies; j++) {
+        const p = historicalPointForTrack(track, now - j * delayMs);
+        if (!p) {
+          resetQualification();
+          return;
+        }
+        centers.push(p);
+      }
+    }
+
+    let touching = false;
+    const minDistanceSquared = (radius * 2) ** 2;
+    for (let i = 0; i < centers.length && !touching; i++) {
+      for (let j = i + 1; j < centers.length; j++) {
+        const dx = (centers[i].x - centers[j].x) * canvas.width;
+        const dy = (centers[i].y - centers[j].y) * canvas.height;
+        if (dx * dx + dy * dy <= minDistanceSquared) {
+          touching = true;
+          break;
+        }
+      }
+    }
+
+    if (touching) {
+      if (collisionBeganAt === null) collisionBeganAt = now;
+      if (now - collisionBeganAt >= COLLISION_GRACE_MS) {
+        resetQualification();
+      }
+      // 接触中は（許容範囲内でも）時間を加算しない。
+      qualificationWasClear = false;
+      qualificationLastFrame = now;
+      return;
+    }
+
+    collisionBeganAt = null;
+    if (qualificationLastFrame !== null) {
+      const elapsed = now - qualificationLastFrame;
+      if (elapsed > 250) {
+        // タブが止まっていた時間などは成功時間に含めない。
+        resetQualification();
+      } else if (qualificationWasClear && elapsed >= 0) {
+        qualifyingMs += elapsed;
+      }
+    }
+    qualificationWasClear = true;
+    qualificationLastFrame = now;
+
+    if (qualifyingMs >= copies * 2000) {
+      unlockedCopies = Math.min(FINAL_COPIES, unlockedCopies + 2);
+      $("copies").max = unlockedCopies;
+      // 音・メッセージ・アニメーションなし。スライダー上限だけ静かに更新。
+      resetQualification();
+    }
+  }
+
+  // 動きの判定条件が変わった場合は、成功時間を数え直す。
+  ["copies", "delay", "threshold", "strength", "ballSize", "detectCount", "dupOn"]
+    .forEach(id => $(id).addEventListener("input", resetQualification));
+
+ function detectLights() {
+  if (video.readyState < 2) return [];
+
+  actx.drawImage(video, 0, 0, analysis.width, analysis.height);
+
+  const width = analysis.width;
+  const height = analysis.height;
+  const data = actx.getImageData(0, 0, width, height).data;
+  const threshold = Number($("threshold").value);
+
+  const visited = new Uint8Array(width * height);
+  const bright = new Uint8Array(width * height);
+
+  // 明るい画素を探す
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+      const brightness =
+        data[i] * 0.299 +
+        data[i + 1] * 0.587 +
+        data[i + 2] * 0.114;
+
+      if (brightness >= threshold) {
+        bright[y * width + x] = 1;
+      }
+    }
+  }
+
+  const regions = [];
+  const queue = [];
+
+  // つながっている明るい画素を、ひとまとまりとして検出
+  for (let start = 0; start < bright.length; start++) {
+    if (!bright[start] || visited[start]) continue;
+
+    queue.length = 0;
+    queue.push(start);
+    visited[start] = 1;
+
+    let head = 0;
+    let count = 0;
+    let sx = 0;
+    let sy = 0;
+    let sum = 0;
+
+    while (head < queue.length) {
+      const index = queue[head++];
+      const x = index % width;
+      const y = Math.floor(index / width);
+      const i = index * 4;
+
+      const brightness =
+        data[i] * 0.299 +
+        data[i + 1] * 0.587 +
+        data[i + 2] * 0.114;
+      const weight = brightness - threshold + 1;
+
+      sx += x * weight;
+      sy += y * weight;
+      sum += weight;
+      count++;
+
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx;
+          const ny = y + dy;
+
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
+            continue;
+          }
+
+          const next = ny * width + nx;
+
+          if (bright[next] && !visited[next]) {
+            visited[next] = 1;
+            queue.push(next);
+          }
+        }
+      }
+    }
+
+    // 小さなノイズを除外
+    if (count >= 3 && sum > 0) {
+      let x = sx / sum / width;
+      const y = sy / sum / height;
+
+      if (facing === "user") x = 1 - x;
+
+      regions.push({
+        x,
+        y,
+        size: count,
+        brightness: sum
+      });
+    }
+  }
+
+  // 大きな明るい領域を優先し、最大2個を返す
+  regions.sort((a, b) => b.size - a.size);
+
+  return regions.slice(0, 2).map(point => ({
+    x: point.x,
+    y: point.y,
+    time: performance.now()
+  }));
+}
+
+  function historicalPoint(targetTime) {
+    if (points.length === 0) return null;
+
+    for (let i = points.length - 1; i >= 1; i--) {
+      const a = points[i - 1];
+      const b = points[i];
+
+      if (a.time <= targetTime && b.time >= targetTime) {
+        const span = b.time - a.time;
+        const t = span > 0 ? (targetTime - a.time) / span : 0;
+        return {
+          x: a.x + (b.x - a.x) * t,
+          y: a.y + (b.y - a.y) * t
+        };
+      }
+    }
+
+    return points[0];
+  }
+
+  function drawCamera() {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (!$("cameraBg").checked || video.readyState < 2) return;
+
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return;
+
+    const scale = Math.max(canvas.width / vw, canvas.height / vh);
+    const dw = vw * scale;
+    const dh = vh * scale;
+    const dx = (canvas.width - dw) / 2;
+    const dy = (canvas.height - dh) / 2;
+
+    ctx.save();
+    if (facing === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, dx, dy, dw, dh);
+    ctx.restore();
+  }
+
+  function drawGlow(point, index, total, strength) {
+    const x = point.x * canvas.width;
+    const y = point.y * canvas.height;
+    const radius = (11 + strength * 4) * ballSize;
+    const hue = (190 + index * 27) % 360;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.shadowBlur = 22 * strength;
+    ctx.shadowColor = `hsla(${hue},100%,65%,0.95)`;
+    ctx.fillStyle = `hsla(${hue},100%,75%,${Math.max(.2, 0.9 - index * .08)})`;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawTrail(now) {
+    if (!$("trailOn").checked || points.length < 2) return;
+
+   const trailDuration = Number($("trailSeconds").value) * 1000;
+   const visiblePoints = points.filter(p => now - p.time < trailDuration);
+    if (visiblePoints.length < 2) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    for (let i = 1; i < visiblePoints.length; i++) {
+      const a = visiblePoints[i - 1];
+      const b = visiblePoints[i];
+      const age = now - b.time;
+
+      ctx.beginPath();
+      ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
+      ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
+      ctx.strokeStyle = `rgba(100,210,255,${Math.max(0.03, 0.5 - age / 2500)})`;
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "#65dfff";
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+ function render(now) {
+  drawCamera();
+
+  if (stream && now - lastDetection > 33) {
+    const detected = detectLights();
+    lastDetection = now;
+
+    const selectedCount = Number($("detectCount").value);
+    const activeCount = Math.min(selectedCount, detected.length);
+
+    for (let i = 0; i < activeCount; i++) {
+      const point = detected[i];
+const track = tracks[i];
+
+let smoothPoint = point;
+
+// 直前の位置を使って、動きをなめらかにする
+if (track.lastPoint && now - track.lastPoint.time < 250) {
+  const smooth = 1.0;
+
+  smoothPoint = {
+    x: track.lastPoint.x + (point.x - track.lastPoint.x) * smooth,
+    y: track.lastPoint.y + (point.y - track.lastPoint.y) * smooth,
+    time: point.time
+  };
+}
+
+track.points.push(smoothPoint);
+track.lastPoint = smoothPoint;
+    }
+  }
+
+  const selectedCount = Number($("detectCount").value);
+
+  for (let i = 0; i < tracks.length; i++) {
+    const track = tracks[i];
+
+    // 軌跡を短くしても、最大9個の時間差複製に必要な履歴は残す。
+    // 9個 × 400ms = 3600ms + 余裕を確保。
+    track.points = track.points.filter(
+      p => now - p.time < Math.max(historyMs, 4000)
+    );
+
+    if (track.lastPoint &&
+        now - track.lastPoint.time > 250) {
+      track.lastPoint = null;
+    }
+
+    if (i >= selectedCount) continue;
+
+    // この光の残像
+    if ($("trailOn").checked && track.points.length >= 2) {
+      const visiblePoints = track.points.filter(
+        p => now - p.time < Number($("trailSeconds").value) * 1000
+      );
+
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      for (let j = 1; j < visiblePoints.length; j++) {
+        const a = visiblePoints[j - 1];
+        const b = visiblePoints[j];
+        const age = now - b.time;
+
+        ctx.beginPath();
+        ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
+        ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
+        ctx.strokeStyle =
+          `rgba(100,210,255,${Math.max(0.03, 0.5 - age / 2500)})`;
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "#65dfff";
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    if (track.lastPoint) {
+      const strength = Number($("strength").value);
+      const count = $("dupOn").checked
+        ? Number($("copies").value)
+        : 0;
+
+      // 実際の光
+      drawGlow(track.lastPoint, 0, count + 1, strength);
+
+      // 時間差でついてくる複製
+      for (let j = 1; j <= count; j++) {
+        const delay = Number($("delay").value) * j;
+        const p = historicalPointForTrack(track, now - delay);
+
+        if (p) drawGlow(p, j, count + 1, strength);
+      }
+    }
+  }
+
+  evaluateUnlock(now);
+  animationId = requestAnimationFrame(render);
+}
+
+function historicalPointForTrack(track, targetTime) {
+  const points = track.points;
+
+  if (points.length === 0) return null;
+
+  for (let i = points.length - 1; i >= 1; i--) {
+    const a = points[i - 1];
+    const b = points[i];
+
+    if (a.time <= targetTime && b.time >= targetTime) {
+      const span = b.time - a.time;
+      const t = span > 0 ? (targetTime - a.time) / span : 0;
+
+      return {
+        x: a.x + (b.x - a.x) * t,
+        y: a.y + (b.y - a.y) * t
+      };
+    }
+  }
+
+  return points[0];
+}
+
+  async function startCamera() {
+    try {
+      if (stream) stopCamera();
+
+      clearHistory();
+      setStatus("カメラ起動中…");
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: facing },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+
+      video.srcObject = stream;
+      await video.play();
+
+      setStatus(facing === "user" ? "内カメラ" : "外カメラ");
+      message("カメラ起動OK！明るいボールを映して動かしてみよう。");
+    } catch (err) {
+      stream = null;
+      setStatus("カメラを起動できません");
+      message("カメラを起動できませんでした。ブラウザのカメラ許可とHTTPS接続を確認してね。");
+      console.error(err);
+    }
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+    video.srcObject = null;
+    clearHistory();
+    setStatus("カメラ停止中");
+    message("カメラを停止しました。");
+  }
+
+  async function switchCamera() {
+    facing = facing === "user" ? "environment" : "user";
+    if (stream) {
+      await startCamera();
+    } else {
+      setStatus(facing === "user" ? "次回：内カメラ" : "次回：外カメラ");
+      message("次回のカメラ起動で選択したカメラを使います。");
+    }
+  }
+
+  function startRecording() {
+    if (!stream) {
+      message("先にカメラを起動してね。");
+      return;
+    }
+
+    if (!canvas.captureStream || !window.MediaRecorder) {
+      message("このブラウザでは録画に対応していない可能性があります。");
+      return;
+    }
+
+    try {
+      const recordingStream = canvas.captureStream(30);
+      const mimeTypes = [
+        "video/mp4",
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm"
+      ];
+      const mimeType = mimeTypes.find(type =>
+        MediaRecorder.isTypeSupported(type)
+      );
+
+      recorder = new MediaRecorder(
+        recordingStream,
+        mimeType ? { mimeType } : undefined
+      );
+      chunks = [];
+
+      recorder.ondataavailable = event => {
+        if (event.data && event.data.size > 0) chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, {
+          type: recorder.mimeType || "video/webm"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `glow-play-${Date.now()}.${blob.type.includes("mp4") ? "mp4" : "webm"}`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        message("録画を保存しました。保存先を確認してね。");
+        recordingStream.getTracks().forEach(t => t.stop());
+        recording = false;
+        $("record").disabled = false;
+        $("clearRecord").disabled = true;
+      };
+
+      recorder.start();
+      recording = true;
+      $("record").disabled = true;
+      $("clearRecord").disabled = false;
+      message("録画中！終わったら「録画停止・保存」を押してね。");
+    } catch (err) {
+      message("録画を開始できませんでした。このブラウザの対応状況を確認してね。");
+      console.error(err);
+    }
+  }
+
+  function stopRecording() {
+    if (recorder && recording && recorder.state !== "inactive") {
+      recorder.stop();
+    }
+  }
+
+  $("start").addEventListener("click", startCamera);
+  $("stop").addEventListener("click", stopCamera);
+  $("switch").addEventListener("click", switchCamera);
+  $("reset").addEventListener("click", clearHistory);
+  $("record").addEventListener("click", startRecording);
+  $("clearRecord").addEventListener("click", stopRecording);
+
+  animationId = requestAnimationFrame(render);
+
+
+  const fullscreenBtn = $("fullscreenBtn");
+  const screenElement = document.querySelector(".screen");
+
+  fullscreenBtn.addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await screenElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      $("message").textContent =
+        "全画面表示に失敗しました。もう一度試してください。";
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
