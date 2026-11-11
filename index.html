@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>reinterpretationJUGGLING</title>
 
 
@@ -279,9 +277,7 @@ h1 {
 
 
 /* 全画面表示ボタン */
-.screen {
-  position: relative;
-}
+.screen { position: relative; }
 
 .fullscreen-btn {
   position: absolute;
@@ -299,7 +295,30 @@ h1 {
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* 全画面では映像を画面いっぱいに */
+/* iPhone Safariは通常のFullscreen APIに対応しないため、
+   画面に固定する疑似全画面表示を使う。 */
+.screen.pseudo-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh; /* dvhに未対応のブラウザ向け */
+  height: 100dvh;
+  max-width: none;
+  aspect-ratio: auto;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.pseudo-fullscreen-active { overflow: hidden; }
+
+/* Mac/iPad等の本当の全画面表示もこれまでどおり使用 */
 .screen:fullscreen {
   width: 100%;
   height: 100%;
@@ -313,23 +332,41 @@ h1 {
   justify-content: center;
 }
 
-/* 全画面時はキャンバスを拡大 */
-.screen:fullscreen #view {
+.screen:fullscreen #view,
+.screen.pseudo-fullscreen #view {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* 投影映像に操作用の表示を出さない */
+/* 全画面では元の操作表示を隠すが、戻るボタンは残す */
 .screen:fullscreen .status,
-.screen:fullscreen .fullscreen-btn {
-  display: none;
+.screen:fullscreen .fullscreen-btn,
+.screen.pseudo-fullscreen .status,
+.screen.pseudo-fullscreen .fullscreen-btn { display: none; }
+
+.exit-fullscreen-btn { display: none; }
+
+.screen:fullscreen .exit-fullscreen-btn,
+.screen.pseudo-fullscreen .exit-fullscreen-btn {
+  display: block;
+  position: absolute;
+  z-index: 10;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 7px;
+  color: #f5faff;
+  background: rgba(20, 30, 38, 0.58);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* 全画面の背景 */
-.screen:fullscreen::backdrop {
-  background: #000;
-}
+.screen:fullscreen::backdrop { background: #000; }
 
 </style>
 
@@ -347,6 +384,9 @@ h1 {
   <div class="status" id="status">カメラ停止中</div>
   <button class="fullscreen-btn" id="fullscreenBtn" type="button">
     ⛶ 全画面表示
+  </button>
+  <button class="exit-fullscreen-btn" id="exitFullscreenBtn" type="button">
+    × 元の画面に戻る
   </button>
 </div>
 
@@ -1089,20 +1129,46 @@ function historicalPointForTrack(track, targetTime) {
 
 
   const fullscreenBtn = $("fullscreenBtn");
+  const exitFullscreenBtn = $("exitFullscreenBtn");
   const screenElement = document.querySelector(".screen");
 
-  fullscreenBtn.addEventListener("click", async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await screenElement.requestFullscreen();
-      } else {
+  function enterPseudoFullscreen() {
+    screenElement.classList.add("pseudo-fullscreen");
+    document.body.classList.add("pseudo-fullscreen-active");
+  }
+
+  async function exitFullscreenMode() {
+    // iPhoneの疑似全画面から戻っても、録画は停止しない。
+    screenElement.classList.remove("pseudo-fullscreen");
+    document.body.classList.remove("pseudo-fullscreen-active");
+
+    if (document.fullscreenElement === screenElement && document.exitFullscreen) {
+      try {
         await document.exitFullscreen();
+      } catch (error) {
+        console.warn("全画面の終了に失敗しました", error);
       }
+    }
+  }
+
+  fullscreenBtn.addEventListener("click", async () => {
+    // iPhoneのSafariでは一般要素のrequestFullscreenは使えないため、
+    // 画面内に固定表示する方式で映像を最大化する。
+    const isIPhone = /iPhone|iPod/.test(navigator.userAgent);
+    if (isIPhone || !screenElement.requestFullscreen || !document.fullscreenEnabled) {
+      enterPseudoFullscreen();
+      return;
+    }
+
+    try {
+      await screenElement.requestFullscreen();
     } catch (error) {
-      $("message").textContent =
-        "全画面表示に失敗しました。もう一度試してください。";
+      // 標準全画面が拒否されたブラウザも同じ表示方式で代替する。
+      enterPseudoFullscreen();
     }
   });
+
+  exitFullscreenBtn.addEventListener("click", exitFullscreenMode);
 
 })();
 </script>
